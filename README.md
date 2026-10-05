@@ -36,3 +36,7 @@ Open http://localhost:4321 and press **Run check now**. Without a key it falls b
 - `data/recruiters.json` — the recruiter directory.
 
 A run with the default config makes about 70 Reqbeat API calls.
+
+## Feedback
+
+Notes on the API from building this are in [FEEDBACK.md](FEEDBACK.md).
