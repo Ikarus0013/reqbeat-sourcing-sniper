@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to use Sourcing Sniper</title>
+<style>
+  :root { color-scheme:light; --bg:#f3f2ee; --tile:#fff; --ink:#191b1f; --muted:#666b74; --line:#e3e1da; --accent:#2456e6; --soft:#edf1fe; --warn:#a8540a; --code:#f0eee8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  .wrap { max-width:820px; margin:0 auto; padding:32px 20px 64px; }
+  h1 { font-size:28px; letter-spacing:-.02em; margin:0 0 6px; }
+  .lede { color:var(--muted); font-size:16px; margin:0 0 22px; }
+  nav { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:22px; }
+  nav a { font-size:12.5px; font-weight:600; text-decoration:none; color:var(--accent); border:1px solid var(--line); background:var(--tile); border-radius:99px; padding:4px 11px; }
+  section { background:var(--tile); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin-bottom:14px; }
+  h2 { font-size:18px; margin:0 0 8px; letter-spacing:-.01em; }
+  h2 span { color:var(--accent); font-variant-numeric:tabular-nums; margin-right:6px; }
+  h3 { font-size:14px; margin:16px 0 4px; }
+  p { margin:0 0 10px; }
+  ul, ol { margin:0 0 10px; padding-left:22px; }
+  li { margin-bottom:5px; }
+  code { background:var(--code); border-radius:5px; padding:1px 5px; font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  pre { background:var(--code); border-radius:10px; padding:12px 14px; overflow-x:auto; margin:0 0 10px; }
+  pre code { background:none; padding:0; }
+  .tablewrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { text-align:left; color:var(--muted); font-size:12px; padding:6px 12px 6px 0; border-bottom:1px solid var(--line); }
+  td { padding:8px 12px 8px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  td:first-child { font-weight:600; white-space:nowrap; }
+  .note { border-left:3px solid var(--warn); padding:2px 0 2px 12px; color:var(--muted); font-size:14px; margin:10px 0; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>How to use Sourcing Sniper</h1>
+  <p class="lede">A small test rig for one question: is Reqbeat's hiring data good enough to build a “pitch recruiters the moment a role opens” business on?</p>
+
+  <nav>
+    <a href="#start">Start it</a><a href="#run">Run a check</a><a href="#read">Read the dashboard</a><a href="#real">Real vs. simulated</a><a href="#change">Change what it looks for</a><a href="#judge">Judge Reqbeat</a><a href="#fix">If something breaks</a>
+  </nav>
+
+  <section id="start">
+    <h2><span>1</span>Start it</h2>
+    <p>Open Terminal and run:</p>
+    <pre><code>cd ~/Desktop/reqbeattest
+npm start</code></pre>
+    <p>Then open <a href="http://localhost:4321">http://localhost:4321</a>. Leave the Terminal window open; closing it (or pressing <code>Ctrl+C</code>) stops the app.</p>
+    <p>Your Reqbeat key lives in the <code>.env</code> file as <code>REQBEAT_API_KEY=...</code>. The pill at the top right of the dashboard tells you whether it was picked up: <b>“live API key”</b> is what you want. <b>“sandbox”</b> means the key is missing and you are seeing a limited free sample.</p>
+    <p class="note">After editing <code>.env</code> you must stop and restart the app. Changes to <code>config.json</code> and <code>data/recruiters.json</code> apply on the next run without a restart.</p>
+  </section>
+
+  <section id="run">
+    <h2><span>2</span>Run a check</h2>
+    <p>Press <b>Run check now</b>. It takes roughly 30 seconds. Behind the button:</p>
+    <ol>
+      <li><b>Trigger.</b> One Reqbeat search per role per country (3 roles × 6 countries = 18 searches), asking only for reqs first seen in the last 7 days. Staffing agencies are filtered out.</li>
+      <li><b>Enrich.</b> For each company found, one lookup for its proper name. The hiring pulse arrives with the search result.</li>
+      <li><b>Match.</b> Every req is scored against the recruiter directory.</li>
+      <li><b>Action.</b> An email to the top-scoring recruiter is drafted. It is never sent.</li>
+    </ol>
+    <p>The page keeps showing the last run until you press the button again, so reloading costs nothing. There is no schedule yet: a “daily check” today means you pressing the button once a day.</p>
+  </section>
+
+  <section id="read">
+    <h2><span>3</span>Read the dashboard</h2>
+    <p>The first screen holds only the essentials; the rest is one click away.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Tile</th><th>What it tells you</th><th>What to look for</th></tr></thead>
+      <tbody>
+        <tr><td>Intro</td><td>Who the tool is for, the goal, and what Reqbeat contributes.</td><td>Read it once; it frames everything below.</td></tr>
+        <tr><td>New openings this week</td><td>Open jobs matching your roles, first seen within the lookback window.</td><td>Is there enough volume to run a daily outreach motion?</td></tr>
+        <tr><td>Opened in the last 48 hours</td><td>Openings first seen in the last two days.</td><td>The number that matters most. The whole pitch is speed.</td></tr>
+        <tr><td>Outreach emails ready</td><td>Openings that found a recruiter scoring 50 or more.</td><td>Should be close to the first number.</td></tr>
+        <tr><td>Openings</td><td>The list, newest first. Filter by role type with the buttons.</td><td>Click one to load it on the right. Check a few by hand against the company's careers page.</td></tr>
+        <tr><td>From signal to email</td><td>The opening, the company's hiring activity, the chosen recruiter and the drafted email.</td><td>Would you actually send this email?</td></tr>
+        <tr><td colspan="3" style="font-weight:400;color:var(--muted)">Behind the “Show the detail behind these numbers” button:</td></tr>
+        <tr><td>Freshness</td><td>Openings by the day Reqbeat first saw them.</td><td>Bars on the left (today, 1d ago). If the left is empty on a weekday, signals are arriving late.</td></tr>
+        <tr><td>By role / By country</td><td>Which searches and markets produce results.</td><td>Zeros. A role with zero means no posting used those exact words in its title.</td></tr>
+        <tr><td>Outbox</td><td>Emails you marked as sent with “Simulate send”.</td><td>A tally of how many signals per run were worth acting on.</td></tr>
+        <tr><td>Reqbeat usage</td><td>Plan, API calls used, and how current the data was.</td><td>Calls per run × runs per day tells you which plan you would need.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>The match score</h3>
+    <p>Out of 100: 50 if the recruiter specialises in that role type, 30 if they cover the country (15 if they work Europe-wide), 5 per job-title keyword they list (max 15), 5 if they place that seniority. The top scorer gets the email; under 50 means no match. It is a simple rule, not an AI model.</p>
+  </section>
+
+  <section id="real">
+    <h2><span>4</span>What is real and what is simulated</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Piece</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Job openings, dates, boards</td><td>Real, live from Reqbeat.</td></tr>
+        <tr><td>Company names and hiring pulse</td><td>Real, live from Reqbeat.</td></tr>
+        <tr><td>Recruiter directory</td><td>Made up. 12 fictional recruiters in <code>data/recruiters.json</code>.</td></tr>
+        <tr><td>Hiring-side contact</td><td>Placeholder. Reqbeat has no people data; you would need a contact provider.</td></tr>
+        <tr><td>Emails</td><td>Drafted from a template. Never sent anywhere.</td></tr>
+        <tr><td>“Simulate send”</td><td>Adds a line to the outbox log in your browser. Nothing else.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="change">
+    <h2><span>5</span>Change what it looks for</h2>
+    <p>Edit <code>config.json</code> in any text editor, save, press <b>Run check now</b>.</p>
+    <pre><code>{
+  "sender": "Ron",              ← name the emails are signed with
+  "lookbackDays": 7,            ← how far back a req may have been first seen
+  "perQueryLimit": 20,          ← max companies per search (25 is the ceiling)
+  "enrichLimit": 60,            ← max company-name lookups per run
+  "roles": [
+    { "query": "ai engineer", "domain": "ai", "label": "AI Engineer" }
+  ],
+  "countries": ["United Kingdom", "Germany"]
+}</code></pre>
+    <ul>
+      <li><b><code>query</code></b> is matched against the job title, and every word must appear exactly. <code>engineer</code> does not match <code>engineers</code>. Shorter queries find more: <code>gtm</code> finds more than <code>gtm engineer</code>.</li>
+      <li><b><code>domain</code></b> is the tag used to pair roles with recruiters (<code>ai</code>, <code>gtm</code>, <code>infra</code>). Add a new tag and give at least one recruiter the same tag.</li>
+      <li><b><code>countries</code></b> must be full English country names. “Europe”, “UK” or “USA” are rejected.</li>
+      <li>Each extra role or country multiplies the number of searches: roles × countries per run.</li>
+    </ul>
+    <h3>Use your own recruiters</h3>
+    <p>Replace the entries in <code>data/recruiters.json</code>. Each one needs:</p>
+    <pre><code>{ "id": "r1", "name": "Jane Doe", "firm": "Acme Search", "email": "jane@acme.com",
+  "domains": ["ai"], "countries": ["Germany"],   ← or ["*"] for Europe-wide
+  "keywords": ["llm", "agent"], "seniority": ["senior", "staff"] }</code></pre>
+  </section>
+
+  <section id="judge">
+    <h2><span>6</span>Use it to judge Reqbeat</h2>
+    <p>Run it once a day for a week and note four things:</p>
+    <ol>
+      <li><b>Speed.</b> Does the “Hot” tile fill up on weekdays, and how many hours sit between a req's first-seen time and your run? Spot-check a few against the company's careers page.</li>
+      <li><b>Volume.</b> Fresh reqs per day for the roles you care about. Watch “By role” for searches that keep returning zero.</li>
+      <li><b>Accuracy.</b> Open ten signals. Are they real, still open, the right role, the right country?</li>
+      <li><b>Cost.</b> Calls per run from the account tile, against the plan's daily quota and price.</li>
+    </ol>
+    <p class="note">Gap to plan for: Reqbeat tells you which company and which role, not who to email. The contact step needs a second data source, and that cost belongs in the business case.</p>
+  </section>
+
+  <section id="fix">
+    <h2><span>7</span>If something breaks</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>You see</th><th>Do this</th></tr></thead>
+      <tbody>
+        <tr><td>Page won't load</td><td>The app isn't running. <code>npm start</code> in the project folder.</td></tr>
+        <tr><td>“address already in use”</td><td>It is already running in another window. Run <code>pkill -f "node server.js"</code>, then <code>npm start</code>.</td></tr>
+        <tr><td>Pill says “sandbox”</td><td>Key not found. Check <code>.env</code> has <code>REQBEAT_API_KEY=yourkey</code> with no quotes or spaces, then restart.</td></tr>
+        <tr><td>Orange “calls failed” bar</td><td>Open it to read the reason. 401/403 = bad key. 429 = quota reached, wait. 422 = a country name or limit in <code>config.json</code> is invalid.</td></tr>
+        <tr><td>Zero fresh reqs</td><td>Raise <code>lookbackDays</code> or shorten the role queries.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <p><a href="/">← Back to the dashboard</a></p>
+</div>
+</body>
+</html>

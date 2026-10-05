@@ -1,0 +1,12 @@
+{
+  "sender": "Ron",
+  "lookbackDays": 7,
+  "perQueryLimit": 20,
+  "enrichLimit": 60,
+  "roles": [
+    { "query": "ai engineer", "domain": "ai", "label": "AI Engineer" },
+    { "query": "gtm engineer", "domain": "gtm", "label": "GTM Engineer" },
+    { "query": "infrastructure architect", "domain": "infra", "label": "Infrastructure Architect" }
+  ],
+  "countries": ["United Kingdom", "Germany", "Netherlands", "France", "Spain", "Ireland"]
+}

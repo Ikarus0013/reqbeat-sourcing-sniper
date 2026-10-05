@@ -1,0 +1,3 @@
+.env
+data/last-run.json
+node_modules

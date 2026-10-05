@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sourcing Sniper · Reqbeat MVP</title>
+<style>
+  :root { color-scheme:light; --bg:#f3f2ee; --tile:#fff; --ink:#191b1f; --muted:#666b74; --line:#e3e1da; --accent:#2456e6; --soft:#edf1fe; --good:#0f7a57; --warn:#a8540a; --track:#eeece6; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  a { color:var(--accent); }
+  .wrap { max-width:1320px; margin:0 auto; padding:22px 20px 48px; }
+  header { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-bottom:16px; }
+  h1 { font-size:20px; margin:0; letter-spacing:-.015em; }
+  header p { margin:2px 0 0; color:var(--muted); font-size:13px; max-width:62ch; }
+  .spacer { flex:1; }
+  .pill { font-size:11px; font-weight:600; padding:4px 9px; border-radius:99px; border:1px solid currentColor; white-space:nowrap; color:var(--muted); }
+  .pill.good { color:var(--good); } .pill.warn { color:var(--warn); } .pill.accent { color:var(--accent); }
+  button, .btn { font:inherit; font-weight:600; padding:8px 14px; border-radius:9px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer; text-decoration:none; display:inline-block; }
+  button.ghost, .btn.ghost { background:transparent; color:var(--accent); }
+  button:disabled { opacity:.55; cursor:default; }
+
+  .bento { display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:14px; }
+  .tile { background:var(--tile); border:1px solid var(--line); border-radius:16px; padding:16px 18px; min-width:0; }
+  .s12 { grid-column:span 12; } .s8 { grid-column:span 8; } .s7 { grid-column:span 7; } .s6 { grid-column:span 6; } .s5 { grid-column:span 5; } .s4 { grid-column:span 4; } .s3 { grid-column:span 3; }
+  @media (max-width: 1000px) { .s3 { grid-column:span 6; } .s4, .s5, .s6, .s7, .s8 { grid-column:span 12; } }
+  @media (max-width: 560px) { .s3 { grid-column:span 12; } }
+  .eyebrow { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:0 0 4px; }
+  .tile h2 { font-size:15px; margin:0 0 2px; }
+  .why { color:var(--muted); font-size:12.5px; margin:0 0 12px; max-width:75ch; }
+  .big { font-size:34px; font-weight:700; letter-spacing:-.03em; font-variant-numeric:tabular-nums; line-height:1.1; margin:2px 0 6px; }
+  .kpi .why { margin:0; }
+  .intro { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px 28px; }
+  @media (max-width: 800px) { .intro { grid-template-columns:1fr; } }
+  .intro h2 { font-size:16px; margin:0 0 4px; }
+  .intro p { margin:0; color:var(--muted); font-size:13.5px; }
+  .intro .eyebrow { color:var(--accent); }
+  .more { grid-column:span 12; display:flex; justify-content:center; }
+  .inline { color:var(--muted); font-size:13px; margin:0 0 12px; }
+  .inline b { color:var(--ink); }
+
+  .steps { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
+  @media (max-width: 800px) { .steps { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+  .step { border-left:3px solid var(--accent); padding:2px 0 2px 12px; }
+  .step b { display:block; }
+  .step .n { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .step small { color:var(--muted); display:block; }
+
+  .chart { display:flex; align-items:flex-end; gap:8px; height:130px; }
+  .col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0; }
+  .col .v { font-size:12px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .col .bar { width:100%; max-width:46px; background:var(--accent); border-radius:5px 5px 0 0; min-height:2px; }
+  .col .bar.zero { background:var(--track); }
+  .axis { display:flex; gap:8px; margin-top:6px; border-top:1px solid var(--line); padding-top:5px; }
+  .axis span { flex:1; text-align:center; font-size:11px; color:var(--muted); }
+  .hbar { display:grid; grid-template-columns:minmax(0,1fr) 26px; gap:2px 8px; align-items:center; margin-bottom:9px; font-size:12.5px; }
+  .hbar .trk { grid-column:1; height:8px; background:var(--track); border-radius:4px; overflow:hidden; }
+  .hbar .trk i { display:block; height:100%; background:var(--accent); border-radius:4px; }
+  .hbar .num { grid-row:span 2; text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .tabs button { padding:4px 10px; font-size:12px; background:transparent; color:var(--muted); border-color:var(--line); }
+  .tabs button.on { background:var(--soft); color:var(--accent); border-color:var(--accent); }
+  .list { border:1px solid var(--line); border-radius:11px; max-height:470px; overflow-y:auto; }
+  .row { padding:10px 12px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .row:last-child { border-bottom:0; }
+  .row:hover, .row.sel { background:var(--soft); }
+  .row .t { font-weight:600; overflow-wrap:anywhere; }
+  .row .m { color:var(--muted); font-size:12px; display:flex; gap:4px 10px; flex-wrap:wrap; align-items:center; margin-top:3px; }
+
+  .sec { border-top:1px solid var(--line); padding-top:12px; margin-top:14px; }
+  .sec h3 { font-size:13px; margin:0; }
+  .sec .why { margin-bottom:8px; }
+  .facts { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); gap:8px; }
+  .fact { background:var(--bg); border-radius:9px; padding:8px 10px; }
+  .fact b { display:block; font-size:16px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+  .fact span { color:var(--muted); font-size:11.5px; }
+  .match { display:flex; gap:12px; align-items:flex-start; padding:7px 0; border-bottom:1px dashed var(--line); }
+  .match:last-child { border-bottom:0; }
+  .match .score { font-weight:700; font-variant-numeric:tabular-nums; min-width:44px; color:var(--accent); }
+  .match small { color:var(--muted); display:block; }
+  .mail { border:1px solid var(--line); border-radius:11px; overflow:hidden; }
+  .mail .h { padding:9px 12px; border-bottom:1px solid var(--line); font-size:12.5px; color:var(--muted); background:var(--bg); overflow-wrap:anywhere; }
+  .mail .h b { color:var(--ink); }
+  .mail pre { margin:0; padding:12px; white-space:pre-wrap; font-family:inherit; font-size:13.5px; line-height:1.55; overflow-wrap:anywhere; }
+  .actions { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+  .tablewrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  th { text-align:left; color:var(--muted); font-weight:600; font-size:11.5px; padding:5px 10px 5px 0; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:7px 10px 7px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:5px 14px; font-size:12.5px; margin:0; }
+  .kv dt { color:var(--muted); } .kv dd { margin:0; font-weight:600; overflow-wrap:anywhere; }
+  .empty { padding:30px 14px; text-align:center; color:var(--muted); }
+  .notice { border:1px solid var(--warn); color:var(--warn); border-radius:12px; padding:10px 14px; font-size:12.5px; margin-bottom:14px; background:var(--tile); }
+  .notice summary { cursor:pointer; font-weight:600; }
+  .notice li { overflow-wrap:anywhere; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Sourcing Sniper</h1>
+      <p>A demo built on Reqbeat: fresh job openings in, recruiter outreach out.</p>
+    </div>
+    <span class="spacer"></span>
+    <span id="mode" class="pill">…</span>
+    <a class="btn ghost" href="/guide" target="_blank">How to use this</a>
+    <button id="run">Run check now</button>
+  </header>
+
+  <div id="notice"></div>
+
+  <div class="bento" id="bento">
+    <div class="tile s12"><div class="empty">No run yet. Press “Run check now” to query Reqbeat (takes about 30 seconds).</div></div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const fmt = (iso) => iso ? new Date(iso).toLocaleString([], { dateStyle:'medium', timeStyle:'short' }) : '—';
+const ageDays = (iso) => Math.max(0, Math.floor((Date.now() - new Date(iso)) / 864e5));
+const ageTxt = (iso) => { const d = ageDays(iso); return d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago'; };
+const TIERS = { tier_0:'Free', tier_1:'Trial', tier_2:'Starter', tier_3:'Growth' };
+
+let run = null, filter = 'all', selected = null, showMore = false;
+let sent = [];
+try { sent = JSON.parse(localStorage.getItem('sniper-sent') || '[]'); } catch {}
+const saveSent = () => { try { localStorage.setItem('sniper-sent', JSON.stringify(sent)); } catch {} };
+const isSent = (id) => sent.some((x) => x.id === id);
+
+const tile = (span, eyebrow, title, why, body, cls = '') =>
+  `<section class="tile ${span} ${cls}"><p class="eyebrow">${eyebrow}</p>${title ? `<h2>${title}</h2>` : ''}${why ? `<p class="why">${why}</p>` : ''}${body}</section>`;
+const kpi = (label, n, why) => `<section class="tile s4 kpi"><p class="eyebrow">${label}</p><div class="big">${n}</div><p class="why">${why}</p></section>`;
+const hbars = (pairs) => {
+  const max = Math.max(1, ...pairs.map((p) => p[1]));
+  return pairs.map(([l, n]) => `<div class="hbar"><span>${esc(l)}</span><span class="num">${n}</span><span class="trk"><i style="width:${(n / max) * 100}%"></i></span></div>`).join('');
+};
+
+function render() {
+  const mode = run?.mode || 'sandbox';
+  $('mode').className = 'pill ' + (mode === 'live' ? 'good' : 'warn');
+  $('mode').textContent = mode === 'live' ? 'Reqbeat: live API key' : 'Reqbeat: sandbox (no key)';
+  if (!run || run.empty) return;
+
+  const sig = run.signals, cfg = run.config;
+  const companies = new Set(sig.map((s) => s.companyId)).size;
+  const hot = sig.filter((s) => ageDays(s.firstSeen) <= 2).length;
+  const drafted = sig.filter((s) => s.email).length;
+  const newest = sig[0]?.firstSeen;
+
+  $('notice').innerHTML = run.errors.length
+    ? `<details class="notice"><summary>${run.errors.length} Reqbeat call(s) failed in the last run — results may be incomplete</summary><ul>${run.errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></details>` : '';
+
+  // --- freshness
+  const days = Array.from({ length: cfg.lookbackDays + 1 }, (_, d) => sig.filter((s) => Math.min(ageDays(s.firstSeen), cfg.lookbackDays) === d).length);
+  const maxD = Math.max(1, ...days);
+  const fresh = `<div class="chart">${days.map((n) => `<div class="col"><span class="v">${n}</span><div class="bar ${n ? '' : 'zero'}" style="height:${(n / maxD) * 82}%"></div></div>`).join('')}</div>
+    <div class="axis">${days.map((_, d) => `<span>${d === 0 ? 'today' : d + 'd ago'}</span>`).join('')}</div>`;
+
+  // --- lists
+  const domains = [...new Set(sig.map((s) => s.domain))];
+  const rows = sig.filter((s) => filter === 'all' || s.domain === filter);
+  const list = `<div class="tabs">${['all', ...domains].map((d) => `<button data-f="${esc(d)}" class="${d === filter ? 'on' : ''}">${d === 'all' ? 'All' : esc(d.toUpperCase())} · ${d === 'all' ? sig.length : sig.filter((s) => s.domain === d).length}</button>`).join('')}</div>
+    <div class="list">${rows.length ? rows.map((s) => `
+      <div class="row ${s.id === selected ? 'sel' : ''}" data-id="${esc(s.id)}">
+        <div class="t">${esc(s.company)} — ${esc(s.title)}</div>
+        <div class="m"><span>${esc(s.country)}</span><span>first seen ${ageTxt(s.firstSeen)}</span>
+          ${isSent(s.id) ? '<span class="pill good">sent (simulated)</span>' : ''}
+        </div>
+      </div>`).join('') : '<div class="empty">No fresh reqs in this window. Widen lookbackDays or the role list in config.json.</div>'}</div>`;
+
+  // --- detail
+  const s = sig.find((x) => x.id === selected);
+  let detail = '<div class="empty">Click a req on the left.</div>';
+  if (s) {
+    const p = s.pulse, m = s.matches[0];
+    const trend = p.direction === 'up' ? 'and hiring is speeding up' : p.direction === 'down' ? 'and hiring is slowing down' : '';
+    detail = `
+      <h2>${esc(s.company)} — ${esc(s.title)}</h2>
+      <p class="inline">${esc(s.country)} · first seen <b>${ageTxt(s.firstSeen)}</b> on ${esc(s.boards.join(', ') || 'a job board')} · the company has <b>${p.openReqs ?? '—'} roles open</b> ${trend}</p>
+      ${m ? `
+      <p class="inline">Best-fit recruiter: <b>${esc(m.name)}</b>, ${esc(m.firm)} (${esc(m.reasons.slice(0, 2).join(', '))}). Sample directory.</p>
+      <div class="mail"><div class="h">To: <b>${esc(s.email.to)}</b><br>Subject: <b>${esc(s.email.subject)}</b></div><pre>${esc(s.email.body)}</pre></div>
+      <div class="actions"><button id="send" ${isSent(s.id) ? 'disabled' : ''}>${isSent(s.id) ? 'Logged as sent (simulated)' : 'Simulate send'}</button><span class="pill warn">demo: no real email is sent</span></div>`
+      : '<p class="inline">No recruiter in the sample directory covers this role.</p>'}`;
+  }
+
+  // --- outbox
+  const outbox = sent.length
+    ? `<div class="tablewrap"><table><thead><tr><th>Logged at</th><th>To</th><th>Subject</th></tr></thead><tbody>${sent.slice().reverse().map((x) => `<tr><td>${fmt(x.at)}</td><td>${esc(x.to)}</td><td>${esc(x.subject)}</td></tr>`).join('')}</tbody></table></div><div class="actions"><button class="ghost" id="clear">Clear log</button></div>`
+    : '<div class="empty">Nothing logged yet. Open a req above and press “Simulate send”.</div>';
+
+  const acct = `<dl class="kv">
+    <dt>Connection</dt><dd>${mode === 'live' ? 'Your API key' : 'Keyless sandbox'}</dd>
+    <dt>Plan</dt><dd>${run.account ? esc(TIERS[run.account.tier] || run.account.tier) : '—'}</dd>
+    <dt>Calls, last run</dt><dd>${run.apiCalls}</dd>
+    <dt>Calls, rolling total</dt><dd>${run.usage?.calls ?? '—'}</dd>
+    <dt>Last run</dt><dd>${fmt(run.ranAt)}</dd>
+    <dt>Data as of</dt><dd>${fmt(run.dataAsOf)}</dd>
+  </dl>`;
+
+  const intro = `<div class="intro">
+    <div><p class="eyebrow">Who this is for</p><h2>Someone who feeds leads to niche tech recruiters</h2><p>Boutique agencies and freelance headhunters win by pitching candidates before rival agencies know a role exists.</p></div>
+    <div><p class="eyebrow">The goal</p><h2>Reach the right recruiter the day a role opens</h2><p>Spot a hard-to-fill opening, pick the recruiter who places that kind of talent in that country, and send them a short, specific heads-up.</p></div>
+    <div><p class="eyebrow">Where Reqbeat comes in</p><h2>It supplies the trigger</h2><p>Reqbeat tells us which company opened which role, where and when, plus how hard that company is hiring. Everything below starts from that data.</p></div>
+  </div>`;
+
+  $('bento').innerHTML =
+    `<section class="tile s12">${intro}</section>` +
+    kpi('New openings this week', sig.length, `${cfg.roles.join(', ')} roles in ${cfg.countries.length} European countries, first seen by Reqbeat in the last ${cfg.lookbackDays} days.`) +
+    kpi('Opened in the last 48 hours', hot, 'The ones worth acting on today. Being early is the whole pitch.') +
+    kpi('Outreach emails ready', drafted, 'Openings matched to a recruiter, with the email already written.') +
+    tile('s5', 'Openings', 'Newest first', 'Click one to see the email it produced.', list) +
+    tile('s7', 'From signal to email', '', '', detail) +
+    `<div class="more"><button class="ghost" id="more">${showMore ? 'Hide the detail' : 'Show the detail behind these numbers'}</button></div>` +
+    (showMore ?
+      tile('s6', 'Freshness', 'How old were the openings when we found them?', 'Openings by the day Reqbeat first saw them. Tall bars on the left mean we are catching them early.', fresh) +
+      tile('s3', 'By role', 'Which searches hit?', 'A zero means no job title contained those exact words.', hbars(cfg.roles.map((r) => [r, sig.filter((x) => x.roleLabel === r).length]))) +
+      tile('s3', 'By country', 'Where are they?', 'Openings per target country.', hbars(cfg.countries.map((c) => [c, sig.filter((x) => x.country === c).length]).sort((a, b) => b[1] - a[1]))) +
+      tile('s8', 'Outbox', 'Simulated sends', 'Emails marked as sent in this demo. Stored in this browser only.', outbox) +
+      tile('s4', 'Reqbeat usage', 'What a run costs', 'Each search and each company lookup is one API call.', acct)
+    : '');
+}
+
+document.addEventListener('click', (e) => {
+  const row = e.target.closest('.row'); const tab = e.target.closest('[data-f]');
+  if (row) { selected = row.dataset.id; render(); }
+  else if (tab) { filter = tab.dataset.f; render(); }
+  else if (e.target.id === 'send') {
+    const s = run.signals.find((x) => x.id === selected);
+    if (s?.email && !isSent(s.id)) { sent.push({ id: s.id, to: s.email.to, subject: s.email.subject, at: new Date().toISOString() }); saveSent(); render(); }
+  }
+  else if (e.target.id === 'clear') { sent = []; saveSent(); render(); }
+  else if (e.target.id === 'more') { showMore = !showMore; render(); }
+});
+
+$('run').addEventListener('click', async () => {
+  const b = $('run'); b.disabled = true; b.textContent = 'Querying Reqbeat…';
+  try {
+    const r = await fetch('/api/run', { method: 'POST' });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    run = d; selected = run.signals[0]?.id ?? null; filter = 'all';
+  } catch (err) { $('notice').innerHTML = `<div class="notice">Run failed: ${esc(err.message)}</div>`; b.disabled = false; b.textContent = 'Run check now'; return; }
+  b.disabled = false; b.textContent = 'Run check now'; render();
+});
+
+fetch('/api/last').then((r) => r.json()).then((d) => { run = d; selected = d.signals?.[0]?.id ?? null; render(); });
+</script>
+</body>
+</html>
