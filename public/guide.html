@@ -118,7 +118,7 @@ npm start</code></pre>
     <ul>
       <li><b><code>query</code></b> is matched against the job title, and every word must appear exactly. <code>engineer</code> does not match <code>engineers</code>. Shorter queries find more: <code>gtm</code> finds more than <code>gtm engineer</code>.</li>
       <li><b><code>domain</code></b> is the tag used to pair roles with recruiters (<code>ai</code>, <code>gtm</code>, <code>infra</code>). Add a new tag and give at least one recruiter the same tag.</li>
-      <li><b><code>countries</code></b> must be full English country names. “Europe”, “UK” or “USA” are rejected.</li>
+      <li><b><code>countries</code></b> must be single countries in English (“UK” and “USA” also work). Regions such as “Europe” or “EU” are rejected.</li>
       <li>Each extra role or country multiplies the number of searches: roles × countries per run.</li>
     </ul>
     <h3>Use your own recruiters</h3>
